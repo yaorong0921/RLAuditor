@@ -317,7 +317,7 @@ def load_xyconcept(n, pretrain):
 
 
 def main():
-  n = 6000  # total dataset size
+  n = 60000  # total dataset size
   n0 = int(n * 0.8)  # training set size
   """Creates the toy dataset main."""
   # Prepares dataset
