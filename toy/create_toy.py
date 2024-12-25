@@ -23,9 +23,37 @@ import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from collections import Counter
+
 # from toy.toy_helper import toy_helper
+import hashlib
 
+def direct_mapping_5_digits(binary_digits, num_labels=30):
+    """
+    Assign labels to 5-bit binary sequences using direct mapping and binning.
 
+    Parameters:
+    - binary_digits (list of lists): List of 5-bit binary sequences.
+    - num_labels (int): Number of labels to distribute fairly.
+
+    Returns:
+    - list: A list of labels corresponding to the binary sequences.
+    """
+    if not all(len(bits) == 5 for bits in binary_digits):
+        raise ValueError("All binary sequences must contain exactly 5 bits.")
+
+    labels = []
+    for digits in binary_digits:
+        # Convert binary list to a proper binary string
+        int_digits = [int(digit) for digit in digits]
+        binary_str = ''.join(map(str, int_digits))  # Ensure no dots or separators
+        decimal_value = int(binary_str, 2)  # Convert binary string to decimal
+        
+        # Map the decimal value to a label
+        label = decimal_value % num_labels  # Ensure labels are within num_labels range
+        labels.append(label)
+
+    return labels
 
 def create_dataset(skip, n_sample=60000):
   """Creates toy dataset and save to disk."""
@@ -266,22 +294,40 @@ def create_dataset(skip, n_sample=60000):
       # plt.show()
 
     # create label by booling functions
-    y = np.zeros((n_sample, 15))
+    y = np.zeros((n_sample, 5))
     y[:, 0] = ((1 - concept[:, 0] * concept[:, 2]) + concept[:, 3]) > 0
     y[:, 1] = concept[:, 1] + (concept[:, 2] * concept[:, 3])
     y[:, 2] = (concept[:, 3] * concept[:, 4]) + (concept[:, 1] * concept[:, 2])
     y[:, 3] = np.bitwise_xor(concept[:, 0], concept[:, 1])
     y[:, 4] = concept[:, 1] + concept[:, 4]
-    y[:, 5] = (1 - (concept[:, 0] + concept[:, 3] + concept[:, 4])) > 0
-    y[:, 6] = np.bitwise_xor(concept[:, 1] * concept[:, 2], concept[:, 4])
-    y[:, 7] = concept[:, 0] * concept[:, 4] + concept[:, 1]
-    y[:, 8] = concept[:, 2]
-    y[:, 9] = np.bitwise_xor(concept[:, 0] + concept[:, 1], concept[:, 3])
-    y[:, 10] = (1 - (concept[:, 2] + concept[:, 4])) > 0
-    y[:, 11] = concept[:, 0] + concept[:, 3] + concept[:, 4]
-    y[:, 12] = np.bitwise_xor(concept[:, 1], concept[:, 2])
-    y[:, 13] = (1 - (concept[:, 0] * concept[:, 4] + concept[:, 3])) > 0
-    y[:, 14] = np.bitwise_xor(concept[:, 4], concept[:, 3])
+#     y[:, 5] = (1 - (concept[:, 0] + concept[:, 3] + concept[:, 4])) > 0
+#     y[:, 6] = np.bitwise_xor(concept[:, 1] * concept[:, 2], concept[:, 4])
+#     y[:, 7] = concept[:, 0] * concept[:, 4] + concept[:, 1]
+#     y[:, 8] = concept[:, 2]
+#     y[:, 9] = np.bitwise_xor(concept[:, 0] + concept[:, 1], concept[:, 3])
+#     y[:, 10] = (1 - (concept[:, 2] + concept[:, 4])) > 0
+#     y[:, 11] = concept[:, 0] + concept[:, 3] + concept[:, 4]
+#     y[:, 12] = np.bitwise_xor(concept[:, 1], concept[:, 2])
+#     y[:, 13] = (1 - (concept[:, 0] * concept[:, 4] + concept[:, 3])) > 0
+#     y[:, 14] = np.bitwise_xor(concept[:, 4], concept[:, 3])
+    y = direct_mapping_5_digits(y, num_labels=10)
+    # Count occurrences of each integer
+    counter = Counter(y)
+
+    # Prepare data for plotting
+    numbers = list(counter.keys())
+    counts = list(counter.values())
+
+    # Plot the distribution
+    plt.bar(numbers, counts, width=0.8, edgecolor='black')
+    plt.title('Bin Distribution of Integer List')
+    plt.xlabel('Numbers')
+    plt.ylabel('Frequency')
+    plt.xticks(numbers)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+    print(y)
+    exit()
 
     np.save('x_data.npy', x)
     np.save('y_data.npy', y)
@@ -317,7 +363,7 @@ def load_xyconcept(n, pretrain):
 
 
 def main():
-  n = 60000  # total dataset size
+  n = 600 # total dataset size
   n0 = int(n * 0.8)  # training set size
   """Creates the toy dataset main."""
   # Prepares dataset
