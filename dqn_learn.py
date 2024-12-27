@@ -197,7 +197,6 @@ def dqn_learing(
     best_mean_episode_reward = -float('inf')
     best_test_reward = -float('inf')
     last_obs, last_div = env.reset()
-    print(last_obs.shape)
     learned_obs = None
     LOG_EVERY_N_STEPS = 10000
 

@@ -107,8 +107,7 @@ class StateActionQNetwork(nn.Module):
 #         print("after")
 #         ipdb.set_trace()
         action_features = self.action_embeddings(action)  # Get action features
-#         expl_features = self.expl_embeddings(expl)  # Get action features
-        
+#         expl_features = self.expl_embeddings(expl)  # Get action features        
         
 #         all_action_features = torch.cat([action_features, expl_features], dim=-1)
 #         q_diver = self.diversity_embeddings(diversity)
