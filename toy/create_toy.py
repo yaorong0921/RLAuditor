@@ -326,12 +326,10 @@ def create_dataset(skip, n_sample=60000):
     plt.xticks(numbers)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
-    print(y)
-    exit()
 
-    np.save('x_data.npy', x)
-    np.save('y_data.npy', y)
-    np.save('concept_data.npy', concept)
+    np.save('../vu2/RL4Auditing/split_data/new/x_data.npy', x)
+    np.save('../vu2/RL4Auditing/split_data/new/y_data.npy', y)
+    np.save('../vu2/RL4Auditing/split_data/new/concept_data.npy', concept)
 
   return width, height
 
@@ -363,7 +361,7 @@ def load_xyconcept(n, pretrain):
 
 
 def main():
-  n = 600 # total dataset size
+  n = 60000 # total dataset size
   n0 = int(n * 0.8)  # training set size
   """Creates the toy dataset main."""
   # Prepares dataset
