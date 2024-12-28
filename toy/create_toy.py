@@ -75,6 +75,8 @@ def create_dataset(skip, n_sample=60000):
               (5.3, 5.3), (7.3, 5.3), (1.3, 7.3), (3.3, 7.3), (5.3, 7.3)] # all possible locations for shape to appear
   x = np.zeros((n_sample, width, height, 3), dtype='uint8') # specify data type to save memory / avoid warning
   color_array = ['green', 'red', 'blue', 'black', 'orange', 'purple', 'yellow']
+    
+  concept_locations = {} 
   if not skip:
     for i in range(n_sample):
       ##############################################
@@ -86,6 +88,7 @@ def create_dataset(skip, n_sample=60000):
       axes.axis('off')
       # added by Tony, without reset all x will draw on same canvas, bug
       ##############################################
+      concept_locations[i] = []
       location_bool = np.zeros(15) # [Added by Tony, or it will inf loop, bug]: for each image, record whether the location has shape already, to avoid overlap
       if i % 1000 == 0:
         print('{} images are created'.format(i))
@@ -231,6 +234,7 @@ def create_dataset(skip, n_sample=60000):
             color=color_array[np.random.randint(100) % 7],
             markersize=8,
             mew=4,)
+        concept_locations[i].append([location[a][0], location[a][1]])
             # ms=8)
       if concept[i, 1] == 1:
         a = np.random.randint(15)
@@ -244,6 +248,7 @@ def create_dataset(skip, n_sample=60000):
             color=color_array[np.random.randint(100) % 7],
             markersize=8,
             mew=4,)
+        concept_locations[i].append([location[a][0], location[a][1]])
             # ms=8)
       if concept[i, 2] == 1:
         a = np.random.randint(15)
@@ -257,6 +262,7 @@ def create_dataset(skip, n_sample=60000):
             color=color_array[np.random.randint(100) % 7],
             markersize=30,
             mew=3,)
+        concept_locations[i].append([location[a][0], location[a][1]])
             # ms=5)
       if concept[i, 3] == 1:
         a = np.random.randint(15)
@@ -270,6 +276,7 @@ def create_dataset(skip, n_sample=60000):
             color=color_array[np.random.randint(100) % 7],
             markersize=8,
             mew=4,)
+        concept_locations[i].append([location[a][0], location[a][1]])
             # ms=8)
       if concept[i, 4] == 1:
         a = np.random.randint(15)
@@ -283,6 +290,7 @@ def create_dataset(skip, n_sample=60000):
             color=color_array[np.random.randint(100) % 7],
             markersize=8,
             mew=4,)
+        concept_locations[i].append([location[a][0], location[a][1]])
             # ms=8)
       canvas.draw()
       image = np.fromstring(
@@ -327,9 +335,10 @@ def create_dataset(skip, n_sample=60000):
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
 
-    np.save('../vu2/RL4Auditing/split_data/new/x_data.npy', x)
-    np.save('../vu2/RL4Auditing/split_data/new/y_data.npy', y)
-    np.save('../vu2/RL4Auditing/split_data/new/concept_data.npy', concept)
+    np.save('../vu2/RL4Auditing/split_data/new2/x_data.npy', x)
+    np.save('../vu2/RL4Auditing/split_data/new2/y_data.npy', y)
+    np.save('../vu2/RL4Auditing/split_data/new2/concept_data.npy', concept)
+    np.save('../vu2/RL4Auditing/split_data/new2/concept_location.npy', concept_locations)
 
   return width, height
 
