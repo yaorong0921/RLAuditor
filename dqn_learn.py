@@ -167,7 +167,7 @@ def dqn_learing(
 #                 obs = torch.from_numpy(obs).type(dtype).unsqueeze(0)
                 # Use volatile = True if variable is only used in inference mode, i.e. don’t save the history
                 mask = index_to_mask(seen, mask_length=env.action_list_length)
-                action = select_epilson_greedy_action(model, obs, all_test_actions, all_test_expls, diversity, t, eps_threshold=1.0, mask=mask) #model(Variable(obs, volatile=True)).data.max(1)[1].cpu()
+                action = select_epilson_greedy_action(model, obs, all_test_actions, all_test_expls, diversity, t, eps_threshold=0.0, mask=mask) #model(Variable(obs, volatile=True)).data.max(1)[1].cpu()
                 obs, reward, done, seen, diversity = env.step(action)
                 step += 1
                 
