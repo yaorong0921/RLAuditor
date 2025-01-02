@@ -84,7 +84,7 @@ class StateActionQNetwork(nn.Module):
         
         # Combine state and action features
         self.q_net = nn.Sequential(
-            nn.Linear(self.base_feature_dim + self.action_feature_dim, self.base_feature_dim*2),  #self.base_feature_dim + self.action_feature_dim, +self.expl_feature_dim, 
+            nn.Linear(self.base_feature_dim + self.action_feature_dim + self.expl_feature_dim, self.base_feature_dim*2),  #self.base_feature_dim + self.action_feature_dim, +self.expl_feature_dim, 
             nn.LayerNorm(self.base_feature_dim*2),
             nn.ReLU(),
             nn.Linear(self.base_feature_dim*2, self.base_feature_dim),
@@ -107,13 +107,13 @@ class StateActionQNetwork(nn.Module):
 #         print("after")
 #         ipdb.set_trace()
         action_features = self.action_embeddings(action)  # Get action features
-#         expl_features = self.expl_embeddings(expl)  # Get action features        
+        expl_features = self.expl_embeddings(expl)  # Get action features        
         
-#         all_action_features = torch.cat([action_features, expl_features], dim=-1)
+        all_action_features = torch.cat([action_features, expl_features], dim=-1)
 #         q_diver = self.diversity_embeddings(diversity)
 
-        obs_repeated = state_features.unsqueeze(1).expand(-1, action_features.shape[0], -1)
-        all_actions = action_features.unsqueeze(0).expand(state_features.shape[0], -1, -1)
+        obs_repeated = state_features.unsqueeze(1).expand(-1, all_action_features.shape[0], -1)
+        all_actions = all_action_features.unsqueeze(0).expand(state_features.shape[0], -1, -1)
         
 #         all_actions = action_features.unsqueeze(0).expand(state_features.shape[0], -1, -1)
 
