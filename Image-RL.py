@@ -116,8 +116,8 @@ def evaluate_model_accuracy(model, dataloader):
 class NPZImageDataset(torch.utils.data.Dataset):
     def __init__(self, npz_path, transform=None):
         data = np.load(npz_path)
-        self.images = data['x']
-        self.labels = data['y']  # Multi-labels as a numpy array
+        self.images = data['x'][:2000]
+        self.labels = data['y'][:2000]  # Multi-labels as a numpy array
         self.transform = transform
 
     def __len__(self):
@@ -334,7 +334,7 @@ class AuditingEnv(gym.Env):
             else:
                 reward = 0
                 reward_expl = 0
-#             self.rewards_expl.append(reward_expl)
+            self.rewards_expl.append(reward_expl)
 
         if not action in self.dataset_seen:
             self.dataset_seen.append(action)
@@ -419,7 +419,7 @@ def main(env, env_test, num_timesteps):
         learning_freq=LEARNING_FREQ,
         frame_history_len=FRAME_HISTORY_LEN,
         target_update_freq=TARGER_UPDATE_FREQ,
-        save_file_name="expl_statistics_1000steps"
+        save_file_name="part_expl_statistics_1000steps"
     )    
 
 def save_gradcam_explanations_to_single_npy(model, test_loader, target_layer, output_file):
