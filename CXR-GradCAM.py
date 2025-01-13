@@ -48,6 +48,10 @@ from torch import nn, optim
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Dataset
 
+import pydicom
+import torch
+import torchvision.models as models
+
 class VinBigDataDataset(Dataset):
     def __init__(self, csv_file, img_dir, transform=None, num_samples=300):
         self.annotations = pd.read_csv(csv_file)
@@ -113,8 +117,10 @@ def save_gradcam_explanations_to_single_npy(model, test_loader, target_layer, ou
     image_count = 0
 
     # Iterate through the test set
-    for inputs, labels in tqdm(test_loader):
+    for t, (inputs, labels) in enumerate(test_loader):
         inputs, labels = inputs.to(device), labels.to(device)
+        if t % 50 == 0:
+            print(t)
         for i in range(inputs.size(0)):
             input_tensor = inputs[i:i+1]  # Select a single image
             label = labels[i].item()
@@ -191,6 +197,23 @@ print(f"Test dataset size: {len(test_dataset)}")
 
 train_annotations = pd.read_csv("../vu2/train.csv")
 train_annotations.head(5)
+
+# Load the pretrained ResNet-50 model
+model = models.resnet50(pretrained=True)
+
+num_classes = 15  # 14 abnormalities + "No finding"
+
+# Target layer for Grad-CAM (e.g., the last convolutional layer)
+target_layer = model.layer4[-1]
+
+# Modify the final fully connected layer to match the number of classes
+model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+
+model.load_state_dict(torch.load("../vu2/CXR-model.pth"))
+
+# Move the model to the appropriate device (GPU or CPU)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
 # Specify output file
 output_file = "../vu2/RL4Auditing/CXR/val_expls.npy"
