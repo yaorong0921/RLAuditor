@@ -12,7 +12,6 @@ import dataclasses
 from dataclasses import dataclass, field
 from typing import Dict, Any, Tuple, Union, List, Optional, Mapping
 from tqdm import tqdm
-from tqdm.notebook import tqdm
 
 import yaml
 import pickle
@@ -195,29 +194,62 @@ print(f"Train dataset size: {len(train_dataset)}")
 print(f"Validation dataset size: {len(val_dataset)}")
 print(f"Test dataset size: {len(test_dataset)}")
 
-train_annotations = pd.read_csv("../vu2/train.csv")
-train_annotations.head(5)
+# Split the dataset into train, validation, and test sets
+random_seed = 42
+annotations = pd.read_csv('../vu2/train.csv')
+train_size = int(0.6 * len(annotations))  # 60% for training
+val_size = int(0.2 * len(annotations))    # 20% for validation
+test_size = len(annotations) - train_size - val_size  # Remaining 20% for testing
+indices = list(range(len(annotations)))
+train_dataset_csv, val_dataset_csv, test_dataset_csv = random_split(
+    indices, 
+    [train_size, val_size, test_size], 
+    generator=torch.Generator().manual_seed(random_seed)  # Use the random seed
+)
 
-# Load the pretrained ResNet-50 model
-model = models.resnet50(pretrained=True)
+val_annotations = annotations.iloc[val_dataset_csv.indices]
+val_annotations = val_annotations.reset_index()
 
-num_classes = 15  # 14 abnormalities + "No finding"
+test_annotations = annotations.iloc[test_dataset_csv.indices]
+test_annotations = test_annotations.reset_index()
 
-# Target layer for Grad-CAM (e.g., the last convolutional layer)
-target_layer = model.layer4[-1]
+unique_val = val_annotations.drop_duplicates(subset='image_id', keep='first').index.tolist()
+unique_test = test_annotations.drop_duplicates(subset='image_id', keep='first').index.tolist()
 
-# Modify the final fully connected layer to match the number of classes
-model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+#########################
+# # Load the pretrained ResNet-50 model
+# model = models.resnet50(pretrained=True)
 
-model.load_state_dict(torch.load("../vu2/CXR-model.pth"))
+# num_classes = 15  # 14 abnormalities + "No finding"
 
-# Move the model to the appropriate device (GPU or CPU)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
+# # Target layer for Grad-CAM (e.g., the last convolutional layer)
+# target_layer = model.layer4[-1]
 
-# Specify output file
-output_file = "../vu2/RL4Auditing/CXR/val_expls.npy"
+# # Modify the final fully connected layer to match the number of classes
+# model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
 
-# Generate and save Grad-CAM explanations
-save_gradcam_explanations_to_single_npy(model, val_loader, target_layer, output_file)
+# model.load_state_dict(torch.load("../vu2/CXR-model.pth"))
 
+# # Move the model to the appropriate device (GPU or CPU)
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model = model.to(device)
+
+# # Specify output file
+# output_file = "../vu2/RL4Auditing/CXR/val_expls.npy"
+
+# # Generate and save Grad-CAM explanations
+# save_gradcam_explanations_to_single_npy(model, val_loader, target_layer, output_file)
+###############################
+
+# load expl maps
+test_expl = np.load("../vu2/RL4Auditing/CXR/test_expls.npy", allow_pickle=True).item()
+val_expl = np.load("../vu2/RL4Auditing/CXR/val_expls.npy", allow_pickle=True).item()
+
+val = [val_expl[i] for i in tqdm(unique_val)]
+test = [test_expl[i] for i in tqdm(unique_test)]
+val = np.stack(val, axis=0)
+test = np.stack(test, axis=0)
+
+# # Save the stacked array to a .npy file
+# np.save('../vu2/RL4Auditing/CXR/val_expl2.npy', val)
+# np.save('../vu2/RL4Auditing/CXR/test_expl2.npy', test)
