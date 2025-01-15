@@ -1,13 +1,9 @@
 absl-py==2.0.0
-aiohttp @ file:///rapids/aiohttp-3.8.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl#sha256=0fa375b3d34e71ccccf172cab401cd94a72de7a8cc01847a7b3386204093bb47
-aiosignal @ file:///rapids/aiosignal-1.3.1-py3-none-any.whl#sha256=f8376fb07dd1e86a584e4fcdec80b36b7f81aac666ebc724e2c090300dd83b17
 annotated-types==0.6.0
-apex @ file:///opt/pytorch/apex
 argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
 asttokens==2.4.1
 astunparse==1.6.3
-async-timeout @ file:///rapids/async_timeout-4.0.3-py3-none-any.whl#sha256=7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028
 attrs==23.1.0
 audioread==3.0.1
 beautifulsoup4==4.12.2
@@ -18,7 +14,6 @@ captum==0.7.0
 catalogue==2.0.10
 certifi==2023.11.17
 cffi==1.16.0
-charset-normalizer @ file:///rapids/charset_normalizer-3.3.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl#sha256=c0e842112fe3f1a4ffcf64b06dc4c61a88441c2f02f373367f7b4c1aa9be2ad5
 click==8.1.7
 cloudpathlib==0.16.0
 cloudpickle @ file:///rapids/cloudpickle-3.0.0-py3-none-any.whl#sha256=246ee7d0c295602a036e86369c77fecda4ab17b506496730f2f576d9016fd9c7
