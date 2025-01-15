@@ -618,7 +618,7 @@ def main(env, env_test, num_timesteps):
         learning_freq=LEARNING_FREQ,
         frame_history_len=FRAME_HISTORY_LEN,
         target_update_freq=TARGER_UPDATE_FREQ,
-        save_file_name="../vu2/RL4Auditing/CXR/expl_statistics_1000steps"
+        save_file_name="../vu2/RL4Auditing/CXR/expl_nolearnstate_statistics_1000steps"
     )
     
 n_classes = 15
