@@ -33,6 +33,7 @@ from dqn_model import DQN, StateActionQNetwork
 from dqn_learn import OptimizerSpec, dqn_learing
 from utils.gym import get_env, get_wrapper_by_name
 from utils.schedule import LinearSchedule
+from itertools import islice
 
 BATCH_SIZE = 128
 GAMMA = 0.99
@@ -41,7 +42,7 @@ LEARNING_STARTS = 50000
 LEARNING_FREQ = 4
 FRAME_HISTORY_LEN = 16
 TARGER_UPDATE_FREQ = 1000
-LEARNING_RATE = 0.00025
+LEARNING_RATE = 0.001 #0.00025
 ALPHA = 0.95
 EPS = 0.01
 
@@ -419,7 +420,7 @@ def main(env, env_test, num_timesteps):
         learning_freq=LEARNING_FREQ,
         frame_history_len=FRAME_HISTORY_LEN,
         target_update_freq=TARGER_UPDATE_FREQ,
-        save_file_name="part_expl_statistics_1000steps"
+        save_file_name="../vu2/RL4Auditing/split_data/new2/part_expl_statistics_500steps"
     )    
 
 def save_gradcam_explanations_to_single_npy(model, test_loader, target_layer, output_file):
@@ -603,7 +604,11 @@ with open("../vu2/RL4Auditing/split_data/new2/val_position.pkl", 'rb') as file:
      val_location = pickle.load(file)
 with open("../vu2/RL4Auditing/split_data/new2/test_position.pkl", 'rb') as file:  # Open the file in binary read mode
      test_location = pickle.load(file)
-        
+
+test_expl = dict(islice(test_expl.items(), 2000))
+val_expl = dict(islice(val_expl.items(), 2000))
+val_location = val_location[:2000]
+test_location = test_location[:2000]        
         
 model.eval()
 target_list, y_proba, y_test = get_wrong_predictions(model, val_loader)
@@ -639,7 +644,7 @@ print("Embeddings Shape:", expl_test.shape)
 n_classes = 10
 n_features = 25088
 env = AuditingEnv(state_shape=(n_classes*n_classes,), expl_shape=(n_classes*n_features,), action_list_length=len(y_proba), target_list=target_list, dataset=y_proba, explanation=expl, dataset_label=y_test, max_steps=1000)
-env_test = AuditingEnv(state_shape=(n_classes*n_classes,), expl_shape=(n_classes*n_features,), action_list_length=len(y4test_proba), target_list=target4test_list, dataset=y4test_proba, explanation=expl_test, dataset_label=y4test, max_steps=1000, test_env=True, index4test_list_expl=index4test_list_expl)
+env_test = AuditingEnv(state_shape=(n_classes*n_classes,), expl_shape=(n_classes*n_features,), action_list_length=len(y4test_proba), target_list=target4test_list, dataset=y4test_proba, explanation=expl_test, dataset_label=y4test, max_steps=500, test_env=True, index4test_list_expl=index4test_list_expl)
 env.reset()
 env_test.reset()
 
