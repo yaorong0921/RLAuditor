@@ -289,7 +289,7 @@ def dqn_learing(
             episode_rewards =  env.episode_rewards   # get_wrapper_by_name(env, "Monitor").get_episode_rewards()
             if len(episode_rewards) > 0:
                 mean_episode_reward = np.mean(episode_rewards[-100:])
-            if len(episode_rewards) > 100:
+#             if len(episode_rewards) > 100:
                 best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
 #                 if episode_rewards[-1] > max(episode_rewards[:-1]):
                     # Run the test
@@ -311,6 +311,7 @@ def dqn_learing(
             print("episodes %d" % len(episode_rewards))
             print("exploration %f" % exploration.value(t))
             print("best test reward %f" % best_test_reward)
+            print("Expl reward %f" % Statistic["test_reward_expl"][-1])
             sys.stdout.flush()
 
             # Dump statistics to pickle
