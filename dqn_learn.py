@@ -293,7 +293,7 @@ def dqn_learing(
                 best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
 #                 if episode_rewards[-1] > max(episode_rewards[:-1]):
                     # Run the test
-                test_reward, test_reward_expl = test_rl_model(env_test, Q) #, init_state=learned_obs
+                test_reward, test_reward_expl = test_rl_model(env_test, Q, init_state=learned_obs) #
 #                 print(entropy(learned_obs.reshape(-1,5), base=2, axis=1))
                 if best_test_reward < test_reward:
                     best_test_reward = test_reward
