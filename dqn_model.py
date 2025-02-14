@@ -62,10 +62,9 @@ class StateActionQNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(self.base_feature_dim * 2, self.base_feature_dim),
         )
-#         self.action = action
-        self.action_dim = action_shape[-1] # self.action.shape[-1]
+
+        self.action_dim = action_shape[-1] 
         self.expl_dim = expl_shape[-1]
-#         self.diversity_dim = action_shape[0]
         
         # Action feature embedding (for each action)
         self.action_feature_dim = 64 #self.base_feature_dim
@@ -78,19 +77,16 @@ class StateActionQNetwork(nn.Module):
             nn.Linear(self.expl_dim, self.expl_feature_dim),
             nn.LayerNorm(self.expl_feature_dim),
             nn.ReLU())
-#         self.diversity_embeddings = nn.Linear(self.diversity_dim, self.diversity_dim)
-        
-#         self.diversity_embeddings = nn.Linear(self.diversity_dim, self.base_feature_dim)        
-        
+
         # Combine state and action features
         self.q_net = nn.Sequential(
-            nn.Linear(self.base_feature_dim + self.action_feature_dim + self.expl_feature_dim, self.base_feature_dim*2),  #self.base_feature_dim + self.action_feature_dim, +self.expl_feature_dim, 
+            nn.Linear(self.base_feature_dim + self.action_feature_dim + self.expl_feature_dim, self.base_feature_dim*2),  
             nn.LayerNorm(self.base_feature_dim*2),
             nn.ReLU(),
             nn.Linear(self.base_feature_dim*2, self.base_feature_dim),
             nn.LayerNorm(self.base_feature_dim),
             nn.ReLU(),
-            nn.Linear(self.base_feature_dim, 1),  # Output a single Q-value for state-action pair
+            nn.Linear(self.base_feature_dim, 1), 
         )
     def forward(self, state, action, expl):
         """
@@ -101,56 +97,18 @@ class StateActionQNetwork(nn.Module):
         Returns:
             Q-values for the given state-action pairs (batch_size, 1).
         """
-#         print("before")
-#         ipdb.set_trace()
         state_features = self.state_net(state)  # Process state
-#         print("after")
-#         ipdb.set_trace()
+
         action_features = self.action_embeddings(action)  # Get action features
         expl_features = self.expl_embeddings(expl)  # Get action features        
         
         all_action_features = torch.cat([action_features, expl_features], dim=-1)
-#         q_diver = self.diversity_embeddings(diversity)
 
         obs_repeated = state_features.unsqueeze(1).expand(-1, all_action_features.shape[0], -1)
         all_actions = all_action_features.unsqueeze(0).expand(state_features.shape[0], -1, -1)
-        
-#         all_actions = action_features.unsqueeze(0).expand(state_features.shape[0], -1, -1)
 
-#         all_diversity = q_diver.unsqueeze(1).expand(-1, action_features.shape[0], -1)
         combined = torch.cat([obs_repeated, all_actions], dim=-1)
-#         obs_repeated = state.unsqueeze(1).expand(-1, action.shape[0], -1)
-#         all_actions = action.unsqueeze(0).expand(state.shape[0], -1, -1)
-#         combined = torch.cat([obs_repeated, all_actions], dim=-1)
+
         q_values = self.q_net(combined) # Compute Q-values
-#         print(q_values)
         q = q_values.squeeze(-1)
         return q
-
-# class StateActionQNetwork(nn.Module):
-#     def __init__(self, observation_space, action_space):
-#         super(StateActionQNetwork, self).__init__()
-#         self.state_dim = observation_space.shape[0]
-#         self.action_dim = action_space.n
-#         action_feature_dim = 8  # Example: Embedding size for each action
-#         self.q_net = QNetwork(self.state_dim, self.action_dim, action_feature_dim)
-
-#     def forward(self, obs, deterministic=False):
-#         """
-#         Compute Q-values for all actions given a batch of states.
-#         Args:
-#             obs (torch.Tensor): Batch of states (batch_size, state_dim).
-#         Returns:
-#             Q-values for all actions (batch_size, action_dim).
-#         """
-#         batch_size = obs.shape[0]
-#         all_actions = torch.arange(self.action_dim).expand(batch_size, -1).to(obs.device)
-#         obs_repeated = obs.unsqueeze(1).expand(-1, self.action_dim, -1)
-#         print(obs_repeated[:, 0, :].shape, all_actions[:, 0].shape)
-# #         q_values = torch.stack([
-# #             self.q_net(obs_repeated[:, i], all_actions[:, i])
-# #             for i in range(self.action_dim)
-# #         ], dim=1).squeeze(-1)
-#         q_values = self.q_net(obs_repeated[:, 0, :], all_actions[:, 0])
-#         print(q_values.shape)
-#         return q_values

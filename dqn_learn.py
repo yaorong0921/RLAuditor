@@ -112,12 +112,6 @@ def dqn_learing(
     # BUILD MODEL #
     ###############
 
-#     if len(env.observation_space.shape) == 1:
-#         # This means we are running on low-dimensional observations (e.g. RAM)
-#         input_arg = env.observation_space.shape[0]
-#     else:
-#         img_h, img_w, img_c = env.observation_space.shape
-#         input_arg = frame_history_len * img_c
     num_actions = env.action_space.n
 
     def index_to_mask(indices, mask_length=200):
@@ -134,11 +128,11 @@ def dqn_learing(
         if sample > eps_threshold:
             obs = torch.from_numpy(obs).type(dtype).unsqueeze(0)
             diversity = torch.from_numpy(diversity).type(dtype).unsqueeze(0)
-            # Use volatile = True if variable is only used in inference mode, i.e. don’t save the history
+
             if mask is None:
-                action = model(Variable(obs, volatile=True), actions, expls).data.max(1)[1].cpu() #, Variable(diversity, volatile=True)
+                action = model(Variable(obs, volatile=True), actions, expls).data.max(1)[1].cpu() #, 
             else:
-                action = (model(Variable(obs, volatile=True), actions, expls).data.cpu()*mask[np.newaxis, :]).max(1)[1] #, Variable(diversity, volatile=True)
+                action = (model(Variable(obs, volatile=True), actions, expls).data.cpu()*mask[np.newaxis, :]).max(1)[1] 
             return action
         else:
             return torch.IntTensor([random.randrange(actions.shape[0])])
@@ -163,11 +157,8 @@ def dqn_learing(
             step = 0  
             seen = []
             while not done:
-                # Predict the action using the trained model
-#                 obs = torch.from_numpy(obs).type(dtype).unsqueeze(0)
-                # Use volatile = True if variable is only used in inference mode, i.e. don’t save the history
                 mask = index_to_mask(seen, mask_length=env.action_list_length)
-                action = select_epilson_greedy_action(model, obs, all_test_actions, all_test_expls, diversity, t, eps_threshold=0.0, mask=mask) #model(Variable(obs, volatile=True)).data.max(1)[1].cpu()
+                action = select_epilson_greedy_action(model, obs, all_test_actions, all_test_expls, diversity, t, eps_threshold=0.0, mask=mask) 
                 obs, reward, done, seen, diversity = env.step(action)
                 step += 1
                 
@@ -178,8 +169,8 @@ def dqn_learing(
         return avg_reward/episodes, avg_reward_expl/episodes
 
     # Initialize target q function and q function
-    Q = q_func(env.observation_space.shape[-1], env.dataset.shape, env.dataset_expl.shape).cuda() #.type(dtype)
-    target_Q = q_func(env.observation_space.shape[-1], env.dataset.shape, env.dataset_expl.shape).cuda() #.type(dtype)
+    Q = q_func(env.observation_space.shape[-1], env.dataset.shape, env.dataset_expl.shape).cuda() 
+    target_Q = q_func(env.observation_space.shape[-1], env.dataset.shape, env.dataset_expl.shape).cuda()
     
     all_actions = Variable(torch.tensor(env.dataset).cuda(), volatile=True)
     all_expls = Variable(torch.tensor(env.dataset_expl).cuda(), volatile=True)
@@ -286,15 +277,11 @@ def dqn_learing(
 ####################
 #         ### 4. Log progress and keep track of statistics
         if done:
-            episode_rewards =  env.episode_rewards   # get_wrapper_by_name(env, "Monitor").get_episode_rewards()
+            episode_rewards =  env.episode_rewards   
             if len(episode_rewards) > 0:
                 mean_episode_reward = np.mean(episode_rewards[-100:])
-#             if len(episode_rewards) > 100:
                 best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
-#                 if episode_rewards[-1] > max(episode_rewards[:-1]):
-                    # Run the test
-                test_reward, test_reward_expl = test_rl_model(env_test, Q, init_state=learned_obs) #
-#                 print(entropy(learned_obs.reshape(-1,5), base=2, axis=1))
+                test_reward, test_reward_expl = test_rl_model(env_test, Q, init_state=learned_obs) 
                 if best_test_reward < test_reward:
                     best_test_reward = test_reward
                 Statistic["test_reward"].append(test_reward)
