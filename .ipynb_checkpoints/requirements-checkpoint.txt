@@ -1,4 +1,0 @@
-gym==0.26.2
-gym-notices==0.0.8
-gymnasium==1.0.0
-torch==2.2.0a0+6a974be
